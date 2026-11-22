@@ -39,4 +39,13 @@ for (const f of fs.readdirSync(media)) if (/^(opengraph|twitter)-image/.test(f))
 const ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#1C1F18"/><path fill="#F26522" fill-rule="evenodd" d="M5 20V11a7 7 0 0 1 14 0v9zM9.5 20v-6a2.5 2.5 0 0 1 5 0v6z"/></svg>';
 fs.writeFileSync(path.join(SITE, 'icon.svg'), ICON);
 for (const f of fs.readdirSync(media)) if (/^icon\..*\.svg$/.test(f)) fs.writeFileSync(path.join(media, f), ICON);
+// the artifact serves the site from a versioned folder (/_f/<version>/), not the domain's root: every path the pages
+// and scripts ask for becomes relative to the page
+const ABS = /(["'`(\s])\/(hc\/_next\/|assets\/|icon\.svg|icon-512\.png|apple-icon\.png|favicon\.ico|manifest\.webmanifest|sw\.js)/g;
+const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(path.join(dir, d.name)) : [path.join(dir, d.name)]));
+for (const f of walk(SITE)) {
+  if (!/\.(html|txt|js|css|webmanifest|json)$/.test(f) || f.endsWith('cars.json')) continue;
+  const was = fs.readFileSync(f, 'utf8'), now = was.replace(ABS, '$1./$2');
+  if (now !== was) fs.writeFileSync(f, now);
+}
 console.log(`\nThe Hacienda in ${path.relative(process.cwd(), SITE) || '.'}/`);

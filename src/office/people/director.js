@@ -1,7 +1,7 @@
 // The director: brings each prompt to its desk, receives reports.
 import * as THREE from 'three';
 import { state } from '../core/state.js';
-import { PRO, rand, reduceMotion, short } from '../core/env.js';
+import { HACIENDA, PRO, rand, reduceMotion, short } from '../core/env.js';
 import { scene } from '../scene/renderer.js';
 import { mat } from '../scene/blocks.js';
 import { DESKS, dLocal } from '../world/desks.js';
@@ -9,6 +9,7 @@ import { DESK_SPOTS, faceTo } from './navigation.js';
 import { Worker, dn, nearBoss, npcs, sessions, workers } from './workers.js';
 import { sfx } from '../audio/sfx.js';
 import { t as tr } from '../../i18n/index.js';
+import { VEE } from '../hacienda/crew.js';
 
 /* ---------- the director (pro plan) ----------
    You, in the corner office. Each prompt you send, the director carries to that session's person, wherever they are,
@@ -52,7 +53,7 @@ export function setup() {
   paperDocM = mat('#FBFBF7', { roughness: 0.9 });
   Director = class Director extends Worker {
     constructor() {
-      super({ name: tr('people.director'), shirt: '#2B3A55', hair: '#3A3A40', style: 'plain', acc: 'glasses', outfit: 'suit', pants: '#262B35', shoes: '#1B1B1E' }, { id: '__director' });
+      super(HACIENDA ? { name: 'Vee', ...VEE } : { name: tr('people.director'), shirt: '#2B3A55', hair: '#3A3A40', style: 'plain', acc: 'glasses', outfit: 'suit', pants: '#262B35', shoes: '#1B1B1E' }, { id: '__director' });
       this.tagEl.classList.add('tag--boss'); this.tagDot.style.background = '#E2B04A';
       this.queue = []; this.job = null; this.given = 0; this.reports = 0; this.nextIdle = 0;
       this.pos.set(DIR_HOME.x, DIR_HOME.z); this.spot = DIR_HOME; this.pose = 'sit'; this.station = 'home'; this.anim = 'type';

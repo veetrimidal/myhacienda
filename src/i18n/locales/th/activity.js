@@ -21,7 +21,7 @@ export default {
     justDone: 'เพิ่งทำเสร็จ',
     resting: 'พักอยู่ · {time}',
     working: 'กำลังทำงาน',
-    stuck: { repeat: 'ติดอยู่: “{label}” ล้มเหลวซ้ำๆ', compact: 'ติดอยู่: compact ซ้ำไปซ้ำมา', cost: 'ใช้โควตาไปแต่ยังไม่ได้แก้อะไรเลย' },
+    stuck: { blocked: 'ติดขัด: {label}', repeat: 'ติดอยู่: “{label}” ล้มเหลวซ้ำๆ', compact: 'ติดอยู่: compact ซ้ำไปซ้ำมา', cost: 'ใช้โควตาไปแต่ยังไม่ได้แก้อะไรเลย' },
   },
   group: {
     wait: 'รอคุณอนุมัติ',

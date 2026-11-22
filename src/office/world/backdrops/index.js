@@ -1,6 +1,7 @@
 // Choosing the backdrop: city, countryside or beach.
 import * as THREE from 'three';
 import { state } from '../../core/state.js';
+import { HACIENDA } from '../../core/env.js';
 import { scene } from '../../scene/renderer.js';
 import { buildCity } from './city.js';
 import { buildCountry } from './countryside.js';
@@ -32,7 +33,8 @@ export function setup() {
     beach: { label: tr('world.scene.beach'), build: buildBeach, fog: ['#D2E6F1', '#12223A'], view: 'beach' },
   };
   THEME = THEMES.city;
-  { let saved = 'city'; try { saved = localStorage.getItem('office-scene') || 'city'; } catch { /* storage blocked */ } setScene(THEMES[saved] ? saved : 'city', false); }
+  { const def = HACIENDA ? 'country' : 'city';   // (the Hacienda stands in the Bukidnon hills)
+    let saved = def; try { saved = localStorage.getItem('office-scene') || def; } catch { /* storage blocked */ } setScene(THEMES[saved] ? saved : def, false); }
   if (!state.nightManual) setNight(isNightHour()); else setNight(night);
   setInterval(() => { if (!state.nightManual && night !== isNightHour()) setNight(isNightHour()); }, 1000);   // (the clock chip and the Mac's readings: ui/ticks.js)
 }

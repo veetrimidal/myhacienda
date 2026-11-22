@@ -2,7 +2,8 @@
 // rooms of two pods each (the desks, pods' screens and carpets come from the shared code). Each room's door plaque
 // shows the project that sits in it, and turns back to "Department n" when the room empties.
 import * as THREE from 'three';
-import { HQ, rand } from '../../core/env.js';
+import { HACIENDA, HQ, rand } from '../../core/env.js';
+import { CLAY_D, arcade, archFrame, bougainvillea, fountain, stringLights, stuccoMat, terracottaTex, tileCap, woodSign } from '../../hacienda/build.js';
 import { scene } from '../../scene/renderer.js';
 import { canvasTex, fitText, mat, put, rbox, toonMat } from '../../scene/blocks.js';
 import { metal, potPlant, woodMid } from '../terrace.js';
@@ -15,7 +16,7 @@ import { t as tr } from '../../../i18n/index.js';
 
 /** DEPT_SIGNS[i](name) redraws room i's door plaque: the project's name, or '' for a free room. */
 export const DEPT_SIGNS = [];
-const ACCENTS = ['#3F7CC4', '#6A8042', '#D97757', '#8C4FA8'];
+const ACCENTS = HACIENDA ? ['#D4F53C', '#F26522', '#5EE0C0', '#B9A6FF'] : ['#3F7CC4', '#6A8042', '#D97757', '#8C4FA8'];
 const CARPETS = ['#5E6B7D', '#66735C', '#7B6A5E', '#655F7A'];
 const FONT = '"Be Vietnam Pro", system-ui, sans-serif';
 
@@ -25,7 +26,7 @@ function plaque(i, x, y, z, ry) {
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
   const draw = (name) => {
     const g = c.getContext('2d'), n = i + 1;
-    g.fillStyle = '#1E232B'; g.fillRect(0, 0, 512, 160); g.fillStyle = ACCENTS[i]; g.fillRect(0, 0, 14, 160);
+    g.fillStyle = HACIENDA ? '#1C1F18' : '#1E232B'; g.fillRect(0, 0, 512, 160); g.fillStyle = ACCENTS[i]; g.fillRect(0, 0, 14, 160);
     g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillStyle = name ? '#F3EFE8' : '#9AA3B0'; g.font = `800 ${name ? 56 : 46}px ${FONT}`;
     const title = name ? tr('world.dept.name', { name }) : tr('world.dept.free', { n }); fitText(g, title, 456); g.fillText(title, 263, 66);
@@ -81,16 +82,22 @@ function buildWing() {
   const Z0 = WING.z0, Z1 = WING.z1, mid = (Z0 + Z1) / 2, len = Z1 - Z0;
   /* shell: the slab, and the left outer wall carried on from the core's */
   put(scene, rbox(22.6, 0.5, len, '#7A5A3E', 0.05), 3, -0.25, mid + 0.15);
-  put(scene, rbox(0.3, 4.2, len, mat('#EEE8DE', { roughness: 0.9 }), 0.04), -8.15, 2.1, mid + 0.15);
-  put(scene, rbox(0.42, 0.14, len, '#E2D9C8', 0.03), -8.15, 4.25, mid + 0.15);
-  put(scene, rbox(0.06, 0.18, len, '#6E5440', 0.02), -7.97, 0.09, mid + 0.15);
+  put(scene, rbox(0.3, 4.2, len, HACIENDA ? stuccoMat() : mat('#EEE8DE', { roughness: 0.9 }), 0.04), -8.15, 2.1, mid + 0.15);
+  if (HACIENDA) tileCap(-8.15, 4.25, mid + 0.15, len, false); else put(scene, rbox(0.42, 0.14, len, '#E2D9C8', 0.03), -8.15, 4.25, mid + 0.15);
+  put(scene, rbox(0.06, 0.18, len, HACIENDA ? CLAY_D : '#6E5440', 0.02), -7.97, 0.09, mid + 0.15);
   for (const z of [12.4, 16.8, 20.6, 24.4]) wallWindow(-7.98, 2.1, z, 1.5, 1.5, Math.PI / 2, 2);
 
   /* floors: corridors in pale tiles, each room its own carpet */
   const corridor = gridTex('#D7D2CA', 'rgba(120,110,100,.25)', 2);
+  if (HACIENDA) {   // terracotta everywhere, each Lab's room fired a shade of its own; the patio a little darker
+    floorZone(-8, 14, WING.corA[0], WING.corA[1], terracottaTex(4, -4), 1.6);
+    floorZone(WING.corB[0], WING.corB[1], WING.corA[1], Z1, terracottaTex(4, -8), 1.6);
+    DEPTS.forEach((d, i) => floorZone(d.x0, d.x1, d.z0, d.z1, terracottaTex(4, [2, 6, -2, 10][i]), 2.4));
+  } else {
   floorZone(-8, 14, WING.corA[0], WING.corA[1], corridor, 1.2);
   floorZone(WING.corB[0], WING.corB[1], WING.corA[1], Z1, corridor, 1.2);
   DEPTS.forEach((d, i) => floorZone(d.x0, d.x1, d.z0, d.z1, speckTex(CARPETS[i], 3000, 0.06), 0.8));
+  }
 
   /* walls: the core's front gets two doors; glass between the rooms and the corridors, half walls between rooms */
   const [dw, de] = WING.doors;
@@ -124,9 +131,24 @@ function buildWing() {
 
   /* corridors: the company's sign at the end of corridor A, plants where the corridors end */
   put(scene, rbox(0.03, 2.7, 1.6, mat('#2F4A3D', { roughness: 0.9 }), 0.005), -7.985, 1.35, (WING.corA[0] + WING.corA[1]) / 2);
-  { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 0.42), new THREE.MeshBasicMaterial({ map: plateTex(tr('world.dept.hq'), tr('world.dept.hqSub'), { bg: '#2F4A3D', fg: '#F3EFE8', sub: '#B9D6C4' }) }));
+  { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 0.42), new THREE.MeshBasicMaterial({ map: plateTex(tr('world.dept.hq'), tr('world.dept.hqSub'), HACIENDA ? { bg: '#0D3B2A', fg: '#F8F8F2', sub: '#D4F53C' } : { bg: '#2F4A3D', fg: '#F3EFE8', sub: '#B9D6C4' }) }));
     m.position.set(-7.965, 1.95, (WING.corA[0] + WING.corA[1]) / 2); m.rotation.y = Math.PI / 2; scene.add(m); }
-  potPlant(13.55, 9.9, 1.1, 'monstera'); potPlant(2.7, 25.55, 0.95, 'bush'); potPlant(3.9, 25.55, 0.95, 'snake');
+  potPlant(13.55, 9.9, 1.1, 'monstera');
+  if (HACIENDA) patio(); else { potPlant(2.7, 25.55, 0.95, 'bush'); potPlant(3.9, 25.55, 0.95, 'snake'); }
+}
+
+/* the Hacienda's patio: corridor B open to the sky, arches across it, string lights, a tiled fountain at its end,
+   bougainvillea along it, and the gate out front with the sign */
+function patio() {
+  const [bx0, bx1] = WING.corB, cx = (bx0 + bx1) / 2, w = bx1 - bx0;
+  for (const z of [12.0, 15.6, 19.6, 23.2]) archFrame(cx, z, 0, w, 3.0, w * 0.8, 2.1, 0.28);
+  stringLights([[bx0 + 0.05, 11.2], [bx1 - 0.05, 13.8], [bx0 + 0.05, 17.6], [bx1 - 0.05, 21.4], [bx0 + 0.05, 25.6]], 2.75, 0.22);
+  fountain(cx, 24.55, 0.62);
+  for (const [x, z, s] of [[bx0 + 0.25, 25.65, 0.8], [bx1 - 0.25, 25.65, 0.8], [bx0 + 0.22, 11.1, 0.7], [bx1 - 0.22, 11.1, 0.7]]) bougainvillea(x, z, s);
+  // the gate: an arcade along the front of the patio's end, a sign over the middle arch
+  arcade(cx - 3.2, 27.2, cx + 3.2, 27.2, 3, 3.1);
+  woodSign(cx, 3.55, 27.38, 0, 'THE HACIENDA', 'Krafted Lab', 2.0);
+  for (const x of [cx - 4.0, cx + 4.0]) bougainvillea(x, 27.2, 1.1);
 }
 
 export function setup() {

@@ -1,7 +1,7 @@
 // The company's group chat (ui/group-chat.js): the window, and what people write in it. An array is several ways to
 // say the same thing, one picked at random.
 export default {
-  group: 'My Office team',
+  group: process.env.NEXT_PUBLIC_HACIENDA === '1' ? 'Hacienda team' : 'My Office team',
   open: 'Team chat',
   openTitle: 'The company group chat: people post about what they are doing (on this computer only, never sent to Claude)',
   members: '{n} members',

@@ -1,6 +1,7 @@
 // Demo mode: fictional projects and a fictional Mac.
 import { state } from '../core/state.js';
-import { $, STATIC, officeNow, rand, replay } from '../core/env.js';
+import { $, HACIENDA, STATIC, officeNow, rand, replay } from '../core/env.js';
+import { startHacienda } from '../hacienda/feed.js';
 import { CHAIR_IDLE, chairs } from '../world/desks.js';
 import { sessions, subs, workers } from '../people/workers.js';
 import { chatAct, chatApply, chatLeft, chatLoad } from '../ui/group-chat.js';
@@ -143,13 +144,13 @@ export function demoMac() {
     { id: 'clean:claude-tmp', action: 'clean', target: 'claude-tmp', gain: 8.4 * GBb, disk: true, level: 'mid', title: M('tmpTitle'), detail: M('tmpDetail'), verb: M('clean') },
   ];
   return { at: Date.now(), mem: { used: 12.6 * GBb, total: 16 * GBb, pressure: 'warn', swapUsed: 3.1 * GBb, swapTotal: 6 * GBb }, cpu: { percent: 42 + Math.round(Math.random() * 10), cores: 10, load: 4.2 },
-    disk: { used: 301 * GBb, total: 460 * GBb, free: 159 * GBb }, tight: true, diskTight: false, devServers: [dev, lost], claude, orphans: [],
+    disk: { used: 301 * GBb, total: 460 * GBb, free: 159 * GBb }, tight: !HACIENDA, diskTight: false, devServers: HACIENDA ? [] : [dev, lost], claude, orphans: [],
     battery: demoBattery(),
     apps: [{ name: 'Google Chrome', mem: 4.8 * GBb, cpu: 31, count: 22, quit: true }, { name: 'Slack', mem: 1.2 * GBb, cpu: 3, count: 6, quit: true }, { name: 'Spotify', mem: 0.6 * GBb, cpu: 2, count: 5, quit: true }, { name: 'Claude Code', mem: 2.1 * GBb, cpu: 14, count: 6, quit: false }],
     ide: { name: 'Claude Code', mem: 2.1 * GBb, windows: 2, ui: { mem: 0.9 * GBb, n: 6 }, ts: { mem: 0, n: 0 }, ext: { mem: 0.6 * GBb, n: 2 }, other: 0.6 * GBb, chats: claude.length, idleChats: claude.filter((c) => !c.busy).length },
     held: 15.2 * GBb, rules: { sessionIdle: 2700, devIdle: 7200, pressure: 'warn' }, auto: demoAuto,
     trend: Array.from({ length: 31 }, (_, i) => ({ t: Date.now() - (30 - i) * 60e3, used: (11.4 + Math.sin(i / 4) * 0.5 + i * 0.04) * GBb, total: 16 * GBb, swap: (2.2 + i * 0.03) * GBb })),
-    tips, cleanups: [{ id: 'claude-tmp', title: M('tmpTitle'), detail: M('tmpCleanup'), size: 8.4 * GBb }, { id: 'next-cache', title: M('nextTitle'), detail: M('nextDetail'), size: 0.7 * GBb }, { id: 'npm-cache', title: M('npmTitle'), detail: M('npmDetail'), size: 0.3 * GBb }], cleanupsAt: Date.now() };
+    tips: HACIENDA ? [] : tips, cleanups: [{ id: 'claude-tmp', title: M('tmpTitle'), detail: M('tmpCleanup'), size: 8.4 * GBb }, { id: 'next-cache', title: M('nextTitle'), detail: M('nextDetail'), size: 0.7 * GBb }, { id: 'npm-cache', title: M('npmTitle'), detail: M('npmDetail'), size: 0.3 * GBb }], cleanupsAt: Date.now() };
 }
 // What eats the plan in the demo (ui/burn.js): a week of made-up sums for the fictional projects, summed as the server
 // sums its own (src/shared/burn.js), on a plan whose week is 46 % used.
@@ -192,6 +193,7 @@ function demoChecklist(i) {
 const REPLY_KEYS = ['cart', 'speed', 'schedule'];
 const demoReply = (i) => tr(`demo.replies.${REPLY_KEYS[i]}`);
 export function startDemo() {
+  if (HACIENDA) { startHacienda(demoLog); return; }   // (Krafted Lab's bots instead of the fictional projects)
   $('demo-chip').hidden = false;
   state.todos = DEMO_TODOS.map((t) => ({ ...t })); onTodos();
   state.stats = { prompts: 0, read: 0, edit: 0, cmd: 0, deploy: 0 };

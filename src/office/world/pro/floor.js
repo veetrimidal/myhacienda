@@ -1,6 +1,7 @@
 // The company floor: rooms, partitions and furniture.
 import * as THREE from 'three';
-import { PRO, tint } from '../../core/env.js';
+import { HACIENDA, PRO, tint } from '../../core/env.js';
+import { CLAY_D, FOREST, stuccoMat, talaveraTex, terracottaTex, tileCap, weaveTex } from '../../hacienda/build.js';
 import { scene } from '../../scene/renderer.js';
 import { canvasTex, cyl, lampBulbs, mat, put, rbox, rug, toonMat } from '../../scene/blocks.js';
 import { BULB_OFF, metal, potPlant, woodDark, woodMid } from '../terrace.js';
@@ -12,35 +13,47 @@ import { nightHooks, trinket } from '../props/trinkets.js';
 import { OFFICE_MARK, PRO_FX, armchair, backPanel, chairUph, diningSet, floorZone, glassWall, gridTex, leftPanel, lowWall, plankTex, plateTex, speckTex } from './pieces.js';
 import { t as tr } from '../../../i18n/index.js';
 
+// the Hacienda's mark (an arched doorway), on the 24 px grid like OFFICE_MARK
+const HACIENDA_MARK = 'M3 22V11a9 9 0 0 1 18 0v11zM8.5 22v-7.5a3.5 3.5 0 0 1 7 0V22z';
+
 function buildProFloor() {
   /* shell: slab, the two outer walls, their caps */
   put(scene, rbox(22.6, 0.5, 17.6, '#7A5A3E', 0.05), 3, -0.25, 0.5);
-  const wallM = mat('#EEE8DE', { roughness: 0.9 });
+  const wallM = HACIENDA ? stuccoMat() : mat('#EEE8DE', { roughness: 0.9 });   // (the Hacienda: whitewashed stucco)
   put(scene, rbox(22.6, 4.2, 0.3, wallM, 0.04), 3, 2.1, -8.15);
   // (the left one with the stairs' doorway in it, beside the lift: world/entrance.js hangs the door)
   { const a = STAIR.z - STAIR.w / 2, b = STAIR.z + STAIR.w / 2;
     put(scene, rbox(0.3, 4.2, a + 8.3, wallM, 0.01), -8.15, 2.1, (a - 8.3) / 2);
     put(scene, rbox(0.3, 4.2, 9.3 - b, wallM, 0.01), -8.15, 2.1, (b + 9.3) / 2);
     put(scene, rbox(0.3, 4.2 - STAIR.h, STAIR.w, wallM, 0.01), -8.15, (4.2 + STAIR.h) / 2, STAIR.z); }
-  put(scene, rbox(22.6, 0.14, 0.42, '#E2D9C8', 0.03), 3, 4.25, -8.15);
-  put(scene, rbox(0.42, 0.14, 17.6, '#E2D9C8', 0.03), -8.15, 4.25, 0.5);
-  put(scene, rbox(22, 0.18, 0.06, '#6E5440', 0.02), 3, 0.09, -7.97);    // skirting
-  for (const [z0, z1] of [[-8, STAIR.z - STAIR.w / 2 - 0.05], [STAIR.z + STAIR.w / 2 + 0.05, 9]]) put(scene, rbox(0.06, 0.18, z1 - z0, '#6E5440', 0.02), -7.97, 0.09, (z0 + z1) / 2);
+  if (HACIENDA) { tileCap(3, 4.25, -8.15, 22.6, true); tileCap(-8.15, 4.25, 0.5, 17.6, false); }   // (clay roof tiles along the walls' tops)
+  else {
+    put(scene, rbox(22.6, 0.14, 0.42, '#E2D9C8', 0.03), 3, 4.25, -8.15);
+    put(scene, rbox(0.42, 0.14, 17.6, '#E2D9C8', 0.03), -8.15, 4.25, 0.5);
+  }
+  const skirt = HACIENDA ? CLAY_D : '#6E5440';
+  put(scene, rbox(22, 0.18, 0.06, skirt, 0.02), 3, 0.09, -7.97);    // skirting
+  for (const [z0, z1] of [[-8, STAIR.z - STAIR.w / 2 - 0.05], [STAIR.z + STAIR.w / 2 + 0.05, 9]]) put(scene, rbox(0.06, 0.18, z1 - z0, skirt, 0.02), -7.97, 0.09, (z0 + z1) / 2);
 
   /* floors */
   const devWood = plankTex(32, 74, 22), darkWood = plankTex(24, 46, 34), warmWood = plankTex(28, 58);
+  if (HACIENDA) {   // the Hacienda: terracotta through the open floor, Talavera in the pantry and the restrooms
+    floorZone(-3.6, 8.6, -1.6, 9, terracottaTex(4), 2.4);
+    floorZone(-3.6, 8.6, -3, -1.6, terracottaTex(4, -4), 1.6);
+  } else {
   floorZone(-3.6, 8.6, -1.6, 9, devWood);                                                   // dev floor: pale oak walkway
   floorZone(-3.6, 8.6, -3, -1.6, gridTex('#D7D2CA', 'rgba(120,110,100,.25)', 2), 1.2);     // corridor
+  }
   floorZone(-8, -2.6, -8, -3, speckTex('#4A5566', 3000, 0.06), 0.8);                        // director: carpet
   floorZone(-2.6, 3.0, -8, -3, speckTex('#8D939C', 3000, 0.06), 0.8);                       // meeting: carpet
   floorZone(3.0, 8.6, -8, -3, darkWood);                                                    // library
-  floorZone(8.6, 14, -8, 0.6, gridTex('#EFE7D8', 'rgba(150,130,100,.35)', 4, '#D8C3A3'), 1.6); // pantry: checker
-  floorZone(8.6, 14, 0.6, 9, warmWood);                                                     // lounge
+  floorZone(8.6, 14, -8, 0.6, HACIENDA ? talaveraTex(4) : gridTex('#EFE7D8', 'rgba(150,130,100,.35)', 4, '#D8C3A3'), 1.6); // pantry: checker
+  floorZone(8.6, 14, 0.6, 9, HACIENDA ? terracottaTex(4, 4) : warmWood, HACIENDA ? 2.4 : 0);                                                     // lounge
   floorZone(-8, -3.6, -3, 0.55, gridTex('#A3ABB6', 'rgba(60,70,85,.55)', 2, null, 3), 1.2);  // server: raised tiles
-  floorZone(-8, -3.6, 0.55, 5.4, gridTex('#ECE8E1', 'rgba(170,160,150,.45)', 2), 1.6);       // lobby: stone
-  floorZone(-8, -3.6, 5.4, 9, gridTex('#E3EBEF', 'rgba(140,160,175,.6)', 8), 1.2);          // restrooms: mosaic
-  const carpet = gridTex('#9AA2AE', 'rgba(70,78,92,.35)', 4, '#929AA7', 2);                // carpet tiles under each pod
-  for (const [cx, cz] of PODS) { const c = floorZone(cx - 2.0, cx + 2.0, cz - 1.75, cz + 1.75, carpet, 1.2); c.position.y = 0.006; }
+  floorZone(-8, -3.6, 0.55, 5.4, HACIENDA ? terracottaTex(4, -2) : gridTex('#ECE8E1', 'rgba(170,160,150,.45)', 2), HACIENDA ? 2.0 : 1.6);       // lobby: stone
+  floorZone(-8, -3.6, 5.4, 9, HACIENDA ? talaveraTex(4) : gridTex('#E3EBEF', 'rgba(140,160,175,.6)', 8), 1.2);          // restrooms: mosaic
+  const carpet = HACIENDA ? weaveTex() : gridTex('#9AA2AE', 'rgba(70,78,92,.35)', 4, '#929AA7', 2);                // carpet tiles under each pod
+  for (const [cx, cz] of PODS) { const c = floorZone(cx - 2.0, cx + 2.0, cz - 1.75, cz + 1.75, carpet, HACIENDA ? 0 : 1.2); c.position.y = 0.006; }
   rug(-5.4, -5.3, 3.6, 2.9, '#B9A486');                                                     // director
   rug(5.75, -5.4, 3.4, 2.4, '#9E4A3F');                                                     // library
   rug(11.0, 2.55, 3.8, 3.1, '#D8C6A8');                                                     // lounge (TV to sofa)
@@ -48,9 +61,9 @@ function buildProFloor() {
   /* wall finishes, room by room */
   backPanel(-8, -2.6, '#6F5440', 0, 2.75); put(scene, rbox(5.4, 0.06, 0.06, '#4E3A2C', 0.02), -5.3, 2.78, -7.96);
   leftPanel(-8, -3, '#6F5440', 0, 2.75);
-  backPanel(-2.6, 3.0, '#DCE2E8');
-  backPanel(3.0, 8.6, '#C9D5B2', 0, 2.75);
-  backPanel(8.6, 14, '#F4E6CF');
+  backPanel(-2.6, 3.0, HACIENDA ? '#E7D3B3' : '#DCE2E8');
+  backPanel(3.0, 8.6, HACIENDA ? '#5F7A55' : '#C9D5B2', 0, 2.75);
+  backPanel(8.6, 14, HACIENDA ? '#F6E2C4' : '#F4E6CF');
   { // backsplash: subway tiles on one plane a little in front of the paint (stacked panels flickered when zooming)
     const tiles = canvasTex(1024, 128, (g, w, h) => {
       g.fillStyle = '#D9D4CA'; g.fillRect(0, 0, w, h);
@@ -59,7 +72,7 @@ function buildProFloor() {
     put(scene, new THREE.Mesh(new THREE.PlaneGeometry(5.36, 0.64), toonMat({ map: tiles, roughness: 0.35 })), 11.3, 1.3, -7.955); }
   leftPanel(-3, 1.2, '#38404C');
   { const a = STAIR.z - STAIR.w / 2 - 0.05, b = STAIR.z + STAIR.w / 2 + 0.05;   // (the lobby's green, round the stairs' door)
-    leftPanel(1.2, a, '#2F4A3D'); leftPanel(a, b, '#2F4A3D', STAIR.h + 0.06); if (b < 5.38) leftPanel(b, 5.4, '#2F4A3D'); }
+    const lobby = HACIENDA ? FOREST : '#2F4A3D'; leftPanel(1.2, a, lobby); leftPanel(a, b, lobby, STAIR.h + 0.06); if (b < 5.38) leftPanel(b, 5.4, lobby); }
   leftPanel(5.4, 9, '#DDE8EE', 0, 2.0);
 
   /* windows (all show the backdrop) */
@@ -197,12 +210,14 @@ function buildProFloor() {
 
   /* lobby: the My Office sign over the entrance, a reception counter, two waiting chairs */
   { const logo = canvasTex(1024, 220, (g, w, h) => {
-      g.fillStyle = '#1C2620'; g.fillRect(0, 0, w, h);
-      g.save(); g.translate(150, h / 2); g.scale(6.2, 6.2); g.translate(-12, -12); g.fillStyle = '#E8865F'; g.fill(new Path2D(OFFICE_MARK), 'evenodd'); g.restore();
-      g.fillStyle = '#F6EFE4'; g.font = '800 92px "Be Vietnam Pro", system-ui, sans-serif'; g.textBaseline = 'middle'; g.fillText('My Office', 260, h / 2 + 4);
+      g.fillStyle = HACIENDA ? '#1C1F18' : '#1C2620'; g.fillRect(0, 0, w, h);
+      g.save(); g.translate(150, h / 2); g.scale(6.2, 6.2); g.translate(-12, -12); g.fillStyle = HACIENDA ? '#F26522' : '#E8865F'; g.fill(new Path2D(HACIENDA ? HACIENDA_MARK : OFFICE_MARK), 'evenodd'); g.restore();
+      g.fillStyle = '#F6EFE4'; g.font = '800 92px "Be Vietnam Pro", system-ui, sans-serif'; g.textBaseline = 'middle';
+      if (HACIENDA) { g.fillText('The', 260, h / 2 + 4); g.fillStyle = '#D4F53C'; g.fillText('Hacienda', 260 + g.measureText('The ').width, h / 2 + 4); }
+      else g.fillText('My Office', 260, h / 2 + 4);
     });
     const lm = new THREE.MeshBasicMaterial({ map: logo }); PRO_FX.logoM = lm;
-    put(scene, rbox(0.06, 0.62, 2.7, '#1C2620', 0.02), -7.96, 3.6, DZ);
+    put(scene, rbox(0.06, 0.62, 2.7, HACIENDA ? '#1C1F18' : '#1C2620', 0.02), -7.96, 3.6, DZ);
     put(scene, new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.56), lm), -7.92, 3.6, DZ).rotation.y = Math.PI / 2;
     nightHooks.push((on) => lm.color.setScalar(on ? 1.7 : 1)); }
   /* the reception: a U of walnut with a stone ledge for visitors (the My Office plaque on its front), a lower desk

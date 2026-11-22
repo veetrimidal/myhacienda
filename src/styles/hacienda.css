@@ -1,0 +1,26 @@
+/* The Hacienda (Krafted Lab build, html[data-hacienda]): the brand's dark olive ink, lime and orange, and none of the
+   computer's panels (RAM, plan usage, phone, API price): the bots are not sessions on this machine. */
+html[data-hacienda] {
+  --bg: #171A13; --bar: #1C1F18; --side: #1E221A; --card: #252A1F; --card-2: #2C3224; --card-3: #353D2B;
+  --line: rgba(248, 248, 242, .08); --line-2: rgba(248, 248, 242, .15);
+  --ink: #F8F8F2; --muted: #A8AD99; --faint: #707663;
+  --green: #D4F53C; --green-ink: #E4FA86; --green-soft: rgba(212, 245, 60, .12);
+  --amber: #F26522; --amber-soft: rgba(242, 101, 34, .14);
+  --accent: #D4F53C; --accent-hi: #E4FA86; --accent-soft: rgba(212, 245, 60, .12); --accent-line: rgba(212, 245, 60, .6); --on-accent: #1C1F18;
+  --red: #FF5D5D;
+  --font: "Inter Tight", "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+html[data-hacienda] .topbar { border-bottom: 3px solid #D4F53C; }
+html[data-hacienda] .tb-brand { font-weight: 800; letter-spacing: -.02em; }
+html[data-hacienda] .tb-brand .hc-l { color: #D4F53C; font-weight: 800; }
+html[data-hacienda] .tb-brand .logo { color: #F26522; }
+/* nothing here is about this computer */
+html[data-hacienda] #btn-mac,
+html[data-hacienda] #btn-plan,
+html[data-hacienda] #btn-phone,
+html[data-hacienda] #btn-phone-top,
+html[data-hacienda] .kpi--cost,
+html[data-hacienda] #demo-chip { display: none !important; }
+/* the per-tool counters and filters (reads, edits, commands) describe Claude Code sessions, not the bots */
+html[data-hacienda] .kpis,
+html[data-hacienda] #type-chips { display: none !important; }

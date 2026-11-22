@@ -1,3 +1,18 @@
+# The Hacienda (Krafted Lab)
+
+This fork also builds **The Hacienda**: the 3D office as a hacienda (terracotta floors, whitewashed stucco under clay
+tiles, Talavera tiles, an arched patio with a fountain, bougainvillea and string lights) where Krafted Lab's bots work.
+Each bot is a person in the lime Krafted Lab hoodie; each Lab is a team with its own room. Their status comes from the
+bots' check-ins in the Hacienda hub's database (`agents/<id>`: `status`, `task`, `updatedAt`, `log`), read through the
+claude.ai artifact runtime, so it is live only at the hub's claude.ai link.
+
+```bash
+npm run build:hacienda   # static site in hacienda-site/, ready to publish to the artifact
+```
+
+The code is in `src/office/hacienda/` (crew looks, the live feed, the building pieces) and switches on with
+`OFFICE_HACIENDA=1` (see `next.config.mjs`); without it the office builds exactly as before.
+
 # My Office
 
 [![npm](https://img.shields.io/npm/v/claude-my-office?label=npm&color=cb3837)](https://www.npmjs.com/package/claude-my-office) [![CI](https://github.com/khanh020905/my-office/actions/workflows/ci.yml/badge.svg)](https://github.com/khanh020905/my-office/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)

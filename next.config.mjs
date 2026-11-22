@@ -15,6 +15,8 @@ const nextConfig = {
   ...(STATIC && {
     output: 'export',
     basePath: process.env.OFFICE_BASE_PATH || '',
+    // a host that reserves names starting with _ (the claude.ai artifact the Hacienda is published to): its assets under a prefix
+    ...(process.env.OFFICE_ASSET_PREFIX && { assetPrefix: process.env.OFFICE_ASSET_PREFIX }),
     distDir: process.env.OFFICE_DIST_DIR || 'out',
     trailingSlash: true,
     // scripts/build-demo.mjs builds from a copy inside the repo (so the live .next is left alone): resolve from the repo
@@ -22,6 +24,8 @@ const nextConfig = {
   }),
   env: {
     NEXT_PUBLIC_OFFICE_STATIC: STATIC ? '1' : '',
+    // OFFICE_HACIENDA=1: the Krafted Lab Hacienda build (src/office/hacienda/): the bot team's check-ins instead of the demo
+    NEXT_PUBLIC_HACIENDA: process.env.OFFICE_HACIENDA === '1' ? '1' : '',
     NEXT_PUBLIC_BASE_PATH: STATIC ? process.env.OFFICE_BASE_PATH || '' : '',
     // the demo site's root, where English lives; other languages are folders under it
     NEXT_PUBLIC_SITE_ROOT: STATIC ? process.env.OFFICE_SITE_ROOT || '' : '',

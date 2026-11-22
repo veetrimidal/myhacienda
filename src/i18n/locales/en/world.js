@@ -39,12 +39,12 @@ export default {
   // the stairs beside the lift (world/entrance.js): the exit sign over the door, the floor's number on the landing, the plate
   stairs: { exit: 'EMERGENCY EXIT', exitSub: 'STAIRS', floor: 'FLOOR', plate: 'STAIRS', plateSub: 'Floor {n}' },
   dept: {
-    free: 'DEPARTMENT {n}',
-    freeSub: 'free for the next project',
+    free: process.env.NEXT_PUBLIC_HACIENDA === '1' ? 'ROOM {n}' : 'DEPARTMENT {n}',
+    freeSub: process.env.NEXT_PUBLIC_HACIENDA === '1' ? 'free for the next Lab' : 'free for the next project',
     name: '{name}',
-    sub: 'Department {n}',
-    hq: 'HEADQUARTERS',
-    hqSub: 'Departments',
+    sub: process.env.NEXT_PUBLIC_HACIENDA === '1' ? 'Krafted Lab · Room {n}' : 'Department {n}',
+    hq: process.env.NEXT_PUBLIC_HACIENDA === '1' ? 'THE HACIENDA' : 'HEADQUARTERS',
+    hqSub: process.env.NEXT_PUBLIC_HACIENDA === '1' ? 'Krafted Lab' : 'Departments',
     board: 'Sprint board',
     cols: ['To do', 'Doing', 'Done'],
   },

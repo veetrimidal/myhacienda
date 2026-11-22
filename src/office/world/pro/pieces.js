@@ -1,6 +1,7 @@
 // Company floor building pieces: floor finishes, walls, glass, chairs, dining sets.
 import * as THREE from 'three';
-import { rand, tint } from '../../core/env.js';
+import { stuccoMat } from '../../hacienda/build.js';
+import { rand, tint, HACIENDA } from '../../core/env.js';
 import { scene } from '../../scene/renderer.js';
 import { canvasTex, cyl, fitText, mat, noOutline, put, rbox, toonMat } from '../../scene/blocks.js';
 import { metal, woodDark, woodMid } from '../terrace.js';
@@ -139,4 +140,5 @@ export function setup() {
   // Interior walls are real walls, 14 cm thick, shown cut away at 1.3 m like an architect's model so the camera sees
   // into every room: a dark cap where the cut is, skirting on both faces, and at each doorway jambs and a threshold.
   lowWallM = mat('#ECE6DC', { roughness: 0.9 }); cutM = mat('#3B4049', { roughness: 0.7 }); skirtM = mat('#8D7F70', { roughness: 0.7 }); jambM = mat('#6E6052', { roughness: 0.6 });
+  if (HACIENDA) { lowWallM = stuccoMat(); cutM = mat('#B9583A', { roughness: 0.8 }); skirtM = mat('#8F3F27', { roughness: 0.8 }); jambM = mat('#5B3A24', { roughness: 0.6 }); }   // (stucco, a clay coping, terracotta skirting, dark wood)
 }

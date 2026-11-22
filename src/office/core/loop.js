@@ -236,6 +236,7 @@ function keepNear() {
 export function setup() {
   /* ---------- render loop ---------- */
   focusTarget = HOME.clone(); _aim.copy(HOME);
+  if (new URLSearchParams(location.search).has('debug')) window.__officeFocus = focusTarget;   // (?debug: aim the camera from tests)
   state.zoomGoal = null;
   controls.addEventListener('start', () => { state.zoomGoal = null; setView(null); handCam = true; });
   controls.addEventListener('end', () => { handCam = false; });

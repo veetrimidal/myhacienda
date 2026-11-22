@@ -32,10 +32,13 @@ import '@/styles/tips.css';
 import '@/styles/settings.css';
 import '@/styles/responsive.css';
 import '@/styles/phone.css';
+import '@/styles/hacienda.css';
 
 /* The page's title, description and share card (the image and icons are files in app/: opengraph-image.jpg,
    twitter-image.jpg, icon.svg, favicon.ico, apple-icon.png). The online demo knows its address (OFFICE_SITE_URL, set by
    the Pages workflow), so links shared on Facebook, Zalo or X get an absolute image and one URL per language. */
+// the Krafted Lab Hacienda build (src/office/hacienda/)
+const HACIENDA = process.env.NEXT_PUBLIC_HACIENDA === '1', NAME = HACIENDA ? 'The Hacienda' : 'My Office';
 const SITE = process.env.OFFICE_SITE_URL || '', ROOT = process.env.NEXT_PUBLIC_SITE_ROOT || '';
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getLang(), t = await getT();
@@ -43,22 +46,22 @@ export async function generateMetadata(): Promise<Metadata> {
   const at = (sub: string) => `${SITE}${ROOT}${sub}`, url = at(lang === 'en' ? '/' : `/${lang}/`);
   return {
     ...(SITE && { metadataBase: new URL(SITE) }),
-    title: { absolute: 'My Office' }, description, applicationName: 'My Office',
+    title: { absolute: NAME }, description: HACIENDA ? 'Krafted Lab’s bot team at work, live.' : description, applicationName: NAME,
     // (on an iPhone's home screen: full screen, its own name; the manifest is app/manifest.ts)
-    appleWebApp: { capable: true, title: 'My Office', statusBarStyle: 'black-translucent' }, formatDetection: { telephone: false },
+    appleWebApp: { capable: true, title: NAME, statusBarStyle: 'black-translucent' }, formatDetection: { telephone: false },
     keywords: ['Claude Code', 'AI agents', '3D office', 'developer tools', 'văn phòng 3D', 'Claude Code dashboard'],
-    openGraph: { type: 'website', siteName: 'My Office', title, description, locale: lang === 'vi' ? 'vi_VN' : lang === 'th' ? 'th_TH' : 'en_US', ...(SITE && { url }) },
+    openGraph: { type: 'website', siteName: NAME, title, description, locale: lang === 'vi' ? 'vi_VN' : lang === 'th' ? 'th_TH' : 'en_US', ...(SITE && { url }) },
     twitter: { card: 'summary_large_image', title, description },
     ...(SITE && { alternates: { canonical: url, languages: { en: at('/'), vi: at('/vi/') } } }),
   };
 }
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#0E131B' };
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: process.env.NEXT_PUBLIC_HACIENDA === '1' ? '#1C1F18' : '#0E131B' };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     // data-os: the machine's platform, for the words "Mac" / "PC" / "computer" (the online demo is a pretend Mac)
-    <html lang={await getLang()} data-os={process.env.OFFICE_STATIC === '1' ? 'darwin' : process.platform}>
+    <html lang={await getLang()} data-os={process.env.OFFICE_STATIC === '1' ? 'darwin' : process.platform} data-hacienda={HACIENDA ? '' : undefined}>
       <body>
         {children}
         {/* QR codes for "open on your phone" (qrcode.js, MIT), kept local so the office works offline */}

@@ -48,6 +48,7 @@
   "scripts": {
     "dev": "node server/index.mjs --dev",
     "build": "next build",
+    "build:hacienda": "node scripts/build-hacienda.mjs",
     "start": "NODE_ENV=production node server/index.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -62,7 +63,7 @@
     "node": ">=20.9"
   },
   "dependencies": {
-    "next": "16.4.3",
+    "next": "16.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "three": "0.160.0"
